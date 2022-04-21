@@ -95,6 +95,9 @@ def logout():
     session.pop('loggedin', None)
     session.pop('firstname', None)
     session.pop('username', None)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM movies')
+    conn.commit()
 
     # Redirect to login page
     return redirect(url_for('login'))
