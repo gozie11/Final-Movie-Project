@@ -7,8 +7,7 @@ import mysql.connector
 import re
 import sqlite3
 import os.path
-
-
+import json
 
 app = Flask(__name__)
 
@@ -17,12 +16,11 @@ app.secret_key = 'Flask%Crud#Application'
 
 app.permanent_session_lifetime = timedelta(minutes=5)
 
-
 # Enter your database connection details below
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "db.sqlite")
 
-#SqLite database connection
+# SqLite database connection
 conn = sqlite3.connect(db_path, check_same_thread=False)
 
 '''
@@ -40,13 +38,18 @@ app.config['MYSQL_DATABASE_DB'] = 'demo_db'
 # Intialize MySQL
 mysql.init_app(app)
 '''
+# Opening movies.json file
+here = os.path.dirname(os.path.abspath(__file__))
+filename = os.path.join(here, 'static/movies.json')
+f = open(filename)
+
+movie_data = json.load(f)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if 'loggedin' in session:
         return redirect(url_for("home"))
-
 
     # Output message if something goes wrong...
     msg = ''
@@ -118,8 +121,8 @@ def register():
         # conn = mysql.connect()    #MySql connector
         cursor = conn.cursor()
 
-        #cursor.execute('SELECT * FROM users WHERE username = %s', (username,))  #MySql connect statement
-        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))   #SqLite Connect statement
+        # cursor.execute('SELECT * FROM users WHERE username = %s', (username,))  #MySql connect statement
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))  # SqLite Connect statement
         user = cursor.fetchone()
 
         # If user exists show error and validation checks
@@ -132,9 +135,9 @@ def register():
         elif not username or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            # user doesnt exists and the form data is valid, now insert new user into users table
+            # user doesn't exists and the form data is valid, now insert new user into users table
             # MySql Insert statement
-            #cursor.execute('INSERT INTO users VALUES (%s, %s, %s, %s, %s)', (first, last, email, username, hash))
+            # cursor.execute('INSERT INTO users VALUES (%s, %s, %s, %s, %s)', (first, last, email, username, hash))
 
             # SqLite Insert Statement
             cursor.execute('INSERT INTO users (firstname, lastname, email, username, password) VALUES (?, ?, ?, ?, ?)',
@@ -155,9 +158,24 @@ def register():
 def home():
     # Check if user is loggedin
     if 'loggedin' in session:
+        testmovie = ''
+        cursor = conn.cursor()
+        for i in range(1000):
+            testmovie += movie_data[i]['title'] + '\n'
+            title = movie_data[i]['title']
+            year = movie_data[i]['year']
+            cast = movie_data[i]['cast']
+            genre = movie_data[i]['genres']
+            cursor.execute('INSERT INTO movies (title, year, cast, genres) VALUES (?, ?, ?, ?)',
+                           (title, year, "cast", "genre"))
+
+        conn.commit()
+        # cursor.execute('INSERT INTO movies (title, year, cast, genre) VALUES (?, ?, ?, ?)',
+        #                  (i[0], i[1], i[2], i[3]))
+        # print(i)
 
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'])
+        return render_template('home.html', username=session['username'], movies=testmovie)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
@@ -168,7 +186,7 @@ def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
         # We need all the user info for the user so we can display it on the profile page
-        #conn = mysql.connect()
+        # conn = mysql.connect()
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM users WHERE username = ?', (session['username'],))
         user = cursor.fetchone()
