@@ -44,6 +44,7 @@ filename = os.path.join(here, 'static/movies.json')
 f = open(filename)
 
 movie_data = json.load(f)
+movie_data.reverse()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -164,18 +165,22 @@ def home():
         testmovie = ''
         cursor = conn.cursor()
         for i in range(1000):
-            testmovie += movie_data[i]['title'] + '\n'
+            # testmovie += movie_data[i]['title'] + '\n'
             title = movie_data[i]['title']
             year = movie_data[i]['year']
-            cast = movie_data[i]['cast']
-            genre = movie_data[i]['genres']
+            cast = ''
+            genres = ''
+
+            for member in movie_data[i]['cast']:
+                cast += member + ' '
+
+            for genre in movie_data[i]['genres']:
+                genres += genre + ' '
+
             cursor.execute('INSERT INTO movies (title, year, cast, genres) VALUES (?, ?, ?, ?)',
-                           (title, year, "cast", "genre"))
+                           (title, year, cast, genres))
 
         conn.commit()
-        # cursor.execute('INSERT INTO movies (title, year, cast, genre) VALUES (?, ?, ?, ?)',
-        #                  (i[0], i[1], i[2], i[3]))
-        # print(i)
 
         # User is loggedin show them the home page
         return render_template('home.html', username=session['username'], movies=testmovie)
