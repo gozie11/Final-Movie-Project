@@ -23,8 +23,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "db.sqlite")
 
 #SqLite database connection
-#conn = sqlite3.connect(db_path, check_same_thread=False)
+conn = sqlite3.connect(db_path, check_same_thread=False)
 
+'''
 # External database connection
 
 mysql = MySQL()
@@ -38,6 +39,7 @@ app.config['MYSQL_DATABASE_DB'] = 'demo_db'
 
 # Intialize MySQL
 mysql.init_app(app)
+'''
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -113,11 +115,11 @@ def register():
         email = request.form['email']
 
         # Check if user exists using MySQL
-        conn = mysql.connect()    #MySql connector
+        # conn = mysql.connect()    #MySql connector
         cursor = conn.cursor()
 
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))  #MySql connect statement
-        #cursor.execute('SELECT * FROM users WHERE username = ?', (username,))   #SqLite Connect statement
+        #cursor.execute('SELECT * FROM users WHERE username = %s', (username,))  #MySql connect statement
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))   #SqLite Connect statement
         user = cursor.fetchone()
 
         # If user exists show error and validation checks
