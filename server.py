@@ -163,8 +163,10 @@ def home():
     # Check if user is loggedin
     if 'loggedin' in session:
         # testmovie = ''
+        unique_genres = []
+        testmovie = {}
         cursor = conn.cursor()
-        example = "%Drama% "
+        example = "%Drama%"
         for i in range(1000):
             # testmovie += movie_data[i]['title'] + '\n'
             title = movie_data[i]['title']
@@ -174,18 +176,23 @@ def home():
             for member in movie_data[i]['cast']:
                 cast += member + ' '
             for genre in movie_data[i]['genres']:
+                if genre not in unique_genres:
+                    unique_genres.append(genre)
                 genres += genre + ' '
             cursor.execute('INSERT INTO movies (title, year, cast, genres) '
                            'VALUES (?, ?, ?, ?)',
                            (title, year, cast, genres))
         conn.commit()
 
+        #for genre in unique_genres:
+
+
         cursor.execute('SELECT * FROM movies WHERE genres LIKE ? ', (example,))
 
-        testmovie = cursor.fetchmany(100)
+        testmovie[example[1:-1]] = cursor.fetchmany(100)
 
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'], movies=testmovie)
+        return render_template('home.html', username=session['username'], movies=testmovie,)
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
