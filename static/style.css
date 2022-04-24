@@ -5,6 +5,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+table, th, td {
+  border: 1px solid black;
+}
+
 body {
     background-color: #435165;
     margin: 0;

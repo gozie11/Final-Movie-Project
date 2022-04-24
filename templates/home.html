@@ -5,5 +5,17 @@
 {% block content %}
 <h2>Home Page</h2>
 <p>Welcome back, {{ username }}!</p>
-    <p> List of movies, {{ movies }}</p>
+    <div>
+        <img src = "{{ url_for('static', filename='movieBackground.jpg.tiff') }}"  }}>
+    </div>
+<table>
+    {% for movie in movies %}
+
+        <tr>
+            <td>{{ movie[0] }}</td>
+        </tr>
+
+
+    {% endfor %}
+</table>
 {% endblock %}

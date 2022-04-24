@@ -162,25 +162,27 @@ def register():
 def home():
     # Check if user is loggedin
     if 'loggedin' in session:
-        testmovie = ''
+        # testmovie = ''
         cursor = conn.cursor()
+        example = "%Drama% "
         for i in range(1000):
             # testmovie += movie_data[i]['title'] + '\n'
             title = movie_data[i]['title']
             year = movie_data[i]['year']
             cast = ''
             genres = ''
-
             for member in movie_data[i]['cast']:
                 cast += member + ' '
-
             for genre in movie_data[i]['genres']:
                 genres += genre + ' '
-
-            cursor.execute('INSERT INTO movies (title, year, cast, genres) VALUES (?, ?, ?, ?)',
+            cursor.execute('INSERT INTO movies (title, year, cast, genres) '
+                           'VALUES (?, ?, ?, ?)',
                            (title, year, cast, genres))
-
         conn.commit()
+
+        cursor.execute('SELECT * FROM movies WHERE genres LIKE ? ', (example,))
+
+        testmovie = cursor.fetchmany(100)
 
         # User is loggedin show them the home page
         return render_template('home.html', username=session['username'], movies=testmovie)
