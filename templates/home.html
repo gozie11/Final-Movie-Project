@@ -9,17 +9,16 @@
         <img src = "{{ url_for('static', filename='movieBackground.jpg.tiff') }}"  }}>
     </div>
 
-    <table>
     {% for genre in movies %}
-        <tr><th>{{ genre }}</th></tr>
-
-        {% for movie in movies[genre] %}
-
-        <tr>
-            <td>{{ movie[0] }}</td>
-        </tr>
-        {% endfor %}
-
+        <div>
+            <table>
+              <tr><th>{{ genre }}</th></tr>
+                {% for movie in movies[genre] %}
+                <tr>
+                    <td>{{ movie[0] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
     {% endfor %}
-</table>
 {% endblock %}

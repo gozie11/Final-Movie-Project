@@ -35,7 +35,7 @@ app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'demo_db'
 
 
-# Intialize MySQL
+# Initialize MySQL
 mysql.init_app(app)
 '''
 # Opening movies.json file
@@ -162,13 +162,10 @@ def register():
 def home():
     # Check if user is loggedin
     if 'loggedin' in session:
-        # testmovie = ''
         unique_genres = []
-        testmovie = {}
+        test_movie = {}
         cursor = conn.cursor()
-        example = "%Drama%"
         for i in range(1000):
-            # testmovie += movie_data[i]['title'] + '\n'
             title = movie_data[i]['title']
             year = movie_data[i]['year']
             cast = ''
@@ -184,15 +181,18 @@ def home():
                            (title, year, cast, genres))
         conn.commit()
 
-        #for genre in unique_genres:
+        for genre in unique_genres:
+            # this tweaking of the current_genre variable allows me to search for words containing the specified genre
+            current_genre = '%'
+            current_genre += genre
+            current_genre += '%'
 
-
-        cursor.execute('SELECT * FROM movies WHERE genres LIKE ? ', (example,))
-
-        testmovie[example[1:-1]] = cursor.fetchmany(100)
+            # I have a small bug here. Genres with less than 100 movies are added to my dictionary too many time
+            cursor.execute('SELECT * FROM movies WHERE genres LIKE ? ', (current_genre,))
+            test_movie[current_genre[1:-1]] = cursor.fetchmany(100)
 
         # User is loggedin show them the home page
-        return render_template('home.html', username=session['username'], movies=testmovie,)
+        return render_template('home.html', username=session['username'], movies=test_movie, )
 
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
