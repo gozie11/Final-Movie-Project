@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 
-from flaskext.mysql import MySQL
-import mysql.connector
 import re
 import sqlite3
 import os.path
@@ -115,10 +113,9 @@ def register():
         # Create variables for easy access
         first = request.form['firstname']
         last = request.form['lastname']
-        email = request.form['email']
         username = request.form['username']
         password = request.form['password']
-        hash = generate_password_hash(password)
+        hasher = generate_password_hash(password)
         email = request.form['email']
 
         # Check if user exists using MySQL
@@ -145,9 +142,9 @@ def register():
 
             # SqLite Insert Statement
             cursor.execute('INSERT INTO users (firstname, lastname, email, username, password) VALUES (?, ?, ?, ?, ?)',
-                           (first, last, email, username, hash,))
+                           (first, last, email, username, hasher,))
             conn.commit()
-            msg = 'You have successfully registered!'
+            # msg = 'You have successfully registered!'
             return render_template('index.html')
 
     elif request.method == "POST":
